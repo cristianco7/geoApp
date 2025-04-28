@@ -16,16 +16,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btnCenterLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/center_location"
-        android:src="@drawable/ic_location"
-        app:layout_constraintBottom_toTopOf="@id/bottomToolbar"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomToolbar"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_white" />
+
+        <ImageButton
+                android:id="@+id/btnCenterLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/center_location"
+                android:src="@drawable/ic_location"
+                android:layout_gravity="center" />
+    </FrameLayout>
+
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="150dp">
+
+        <View
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_circle_white" />
+
+        <ImageButton
+                android:id="@+id/btnChangeBaseMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/change_base_map"
+                android:src="@drawable/ic_basemap"
+                android:layout_gravity="center" />
+    </FrameLayout>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/bottomToolbar"

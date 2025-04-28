@@ -3,4 +3,7 @@
     <string name="center_location">Center Location</string>
     <string name="change_base_map">Change Base Map</string>
     <string name="favorites">Favorites</string>
+    <string name="streets">Streets</string>
+    <string name="satellite">Satellite</string>
+    <string name="outdoors">Outdoors</string>
 </resources>
