@@ -1,43 +1,41 @@
 package com.example.geoapp
 
 import android.os.Bundle
+import android.widget.ImageButton
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.geoapp.tools.LocationManager
+import com.example.geoapp.tools.MapManager
 import com.mapbox.maps.MapView
-import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
-import com.mapbox.maps.extension.style.sources.addSource
-import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
+    private lateinit var mapManager: MapManager
+    private lateinit var locationManager: LocationManager
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                locationManager.checkAndEnableLocation()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mapView = findViewById(R.id.mapView)
-        mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS) {
-            loadGeoJson()
+        val btnCenterLocation = findViewById<ImageButton>(R.id.btnCenterLocation)
+        mapManager = MapManager(mapView)
+        locationManager = LocationManager(this, mapView, requestPermissionLauncher)
+
+        mapManager.initializeMap {}
+
+        btnCenterLocation.setOnClickListener {
+            locationManager.checkAndEnableLocation()
         }
 
 
-    }
-
-    private fun loadGeoJson() {
-        mapView.getMapboxMap().getStyle { style ->
-            val geoJsonSource = GeoJsonSource.Builder("geojson-source")
-                .url("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_populated_places_simple.geojson")
-                .build()
-
-            style.addSource(geoJsonSource)
-
-            val symbolLayer = SymbolLayer("geojson-layer", "geojson-source")
-            symbolLayer.iconImage("marker-icon")
-            symbolLayer.iconAllowOverlap(true)
-            symbolLayer.iconIgnorePlacement(true)
-
-            style.addLayer(symbolLayer)
-        }
     }
 }
