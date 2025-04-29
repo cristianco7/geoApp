@@ -15,6 +15,7 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import android.provider.Settings
 import androidx.core.content.edit
 
 class LocationManager(
@@ -36,7 +37,18 @@ class LocationManager(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
-                centerUserLocation()
+                if (isLocationEnabled()) {
+                    centerUserLocation()
+                } else {
+                    UIUtils.createDialog(
+                        context,
+                        Defines.LOCATION_REQUIRED,
+                        Defines.ENABLE_LOCATION
+                    ) {
+                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                        context.startActivity(intent)
+                    }
+                }
             }
 
             !ActivityCompat.shouldShowRequestPermissionRationale(
@@ -49,7 +61,7 @@ class LocationManager(
                     Defines.PERMISSION_DISABLED
                 ) {
                     val intent =
-                        Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                             data = android.net.Uri.fromParts("package", context.packageName, null)
                         }
                     context.startActivity(intent)
@@ -57,10 +69,17 @@ class LocationManager(
             }
 
             else -> {
-                sharedPreferences.edit() { putBoolean("hasRequestedPermission", true) }
+                sharedPreferences.edit { putBoolean("hasRequestedPermission", true) }
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
+    }
+
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as android.location.LocationManager
+        return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
     }
 
 

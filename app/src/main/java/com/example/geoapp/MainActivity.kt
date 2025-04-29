@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mapView: MapView
     private lateinit var mapManager: MapManager
     private lateinit var locationManager: LocationManager
+    private var bottomSheetDialog: BottomSheetDialog? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -48,30 +49,36 @@ class MainActivity : AppCompatActivity() {
         setupMapClickListener()
 
         btnChangeBaseMap.setOnClickListener {
-            val bottomSheetDialog = BottomSheetDialog(this)
-            val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_basemap, null)
-            bottomSheetDialog.setContentView(view)
+            if (bottomSheetDialog == null || !bottomSheetDialog!!.isShowing) {
+                bottomSheetDialog = BottomSheetDialog(this)
+                val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_basemap, null)
+                bottomSheetDialog!!.setContentView(view)
 
-            val recyclerBaseMap = view.findViewById<RecyclerView>(R.id.recyclerBaseMap)
-            recyclerBaseMap.layoutManager = GridLayoutManager(this, 3)
+                val recyclerBaseMap = view.findViewById<RecyclerView>(R.id.recyclerBaseMap)
+                recyclerBaseMap.layoutManager = GridLayoutManager(this, 3)
 
-            val baseMapItems = listOf(
-                BaseMapItem(R.drawable.ic_basemap_street, getString(R.string.streets), Style.MAPBOX_STREETS),
-                BaseMapItem(R.drawable.ic_basemap_satellite, getString(R.string.satellite), Style.SATELLITE),
-                BaseMapItem(R.drawable.ic_basemap_outdoor, getString(R.string.outdoors), Style.OUTDOORS),
-                BaseMapItem(R.drawable.ic_basemap_light, getString(R.string.light), Style.LIGHT),
-                BaseMapItem(R.drawable.ic_basemap_dark, getString(R.string.dark), Style.DARK),
-            )
+                val baseMapItems = listOf(
+                    BaseMapItem(R.drawable.ic_basemap_street, getString(R.string.streets), Style.MAPBOX_STREETS),
+                    BaseMapItem(R.drawable.ic_basemap_satellite, getString(R.string.satellite), Style.SATELLITE),
+                    BaseMapItem(R.drawable.ic_basemap_outdoor, getString(R.string.outdoors), Style.OUTDOORS),
+                    BaseMapItem(R.drawable.ic_basemap_light, getString(R.string.light), Style.LIGHT),
+                    BaseMapItem(R.drawable.ic_basemap_dark, getString(R.string.dark), Style.DARK),
+                )
 
-            val adapter = BaseMapAdapter(baseMapItems) { item ->
-                mapManager.initializeMap(item.styleUrl) {
-                    setupMapClickListener()
+                val adapter = BaseMapAdapter(baseMapItems) { item ->
+                    mapManager.initializeMap(item.styleUrl) {
+                        setupMapClickListener()
+                    }
+                    bottomSheetDialog?.dismiss()
                 }
-                bottomSheetDialog.dismiss()
-            }
-            recyclerBaseMap.adapter = adapter
+                recyclerBaseMap.adapter = adapter
 
-            bottomSheetDialog.show()
+                bottomSheetDialog!!.setOnDismissListener {
+                    bottomSheetDialog = null
+                }
+
+                bottomSheetDialog!!.show()
+            }
         }
 
     }
