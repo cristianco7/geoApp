@@ -6,4 +6,7 @@
     <string name="streets">Streets</string>
     <string name="satellite">Satellite</string>
     <string name="outdoors">Outdoors</string>
+    <string name="base_map">Base Map</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
 </resources>

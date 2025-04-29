@@ -3,9 +3,12 @@ package com.example.geoapp
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.geoapp.adapter.BaseMapAdapter
+import com.example.geoapp.models.BaseMapItem
 import com.example.geoapp.tools.LocationManager
 import com.example.geoapp.tools.MapManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -36,45 +39,47 @@ class MainActivity : AppCompatActivity() {
         mapManager = MapManager(mapView)
         locationManager = LocationManager(this, mapView, requestPermissionLauncher)
 
-        mapManager.initializeMap {}
+        mapManager.initializeMap(Style.MAPBOX_STREETS) {}
 
         btnCenterLocation.setOnClickListener {
             locationManager.checkAndEnableLocation()
         }
 
-        mapView.mapboxMap.addOnMapClickListener { point ->
-            mapManager.addPointToMap(point)
-            true
-        }
+        setupMapClickListener()
 
         btnChangeBaseMap.setOnClickListener {
             val bottomSheetDialog = BottomSheetDialog(this)
             val view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_basemap, null)
             bottomSheetDialog.setContentView(view)
 
-            val imgStreets = view.findViewById<ImageView>(R.id.imgStreets)
-            val imgSatellite = view.findViewById<ImageView>(R.id.imgSatellite)
-            val imgOutdoors = view.findViewById<ImageView>(R.id.imgOutdoors)
+            val recyclerBaseMap = view.findViewById<RecyclerView>(R.id.recyclerBaseMap)
+            recyclerBaseMap.layoutManager = GridLayoutManager(this, 3)
 
-            imgStreets.setOnClickListener {
-                mapView.mapboxMap.loadStyle(Style.MAPBOX_STREETS)
+            val baseMapItems = listOf(
+                BaseMapItem(R.drawable.ic_basemap_street, getString(R.string.streets), Style.MAPBOX_STREETS),
+                BaseMapItem(R.drawable.ic_basemap_satellite, getString(R.string.satellite), Style.SATELLITE),
+                BaseMapItem(R.drawable.ic_basemap_outdoor, getString(R.string.outdoors), Style.OUTDOORS),
+                BaseMapItem(R.drawable.ic_basemap_light, getString(R.string.light), Style.LIGHT),
+                BaseMapItem(R.drawable.ic_basemap_dark, getString(R.string.dark), Style.DARK),
+            )
+
+            val adapter = BaseMapAdapter(baseMapItems) { item ->
+                mapManager.initializeMap(item.styleUrl) {
+                    setupMapClickListener()
+                }
                 bottomSheetDialog.dismiss()
             }
+            recyclerBaseMap.adapter = adapter
 
-            imgSatellite.setOnClickListener {
-                mapView.mapboxMap.loadStyle(Style.SATELLITE)
-                bottomSheetDialog.dismiss()
-            }
-
-            imgOutdoors.setOnClickListener {
-                mapView.mapboxMap.loadStyle(Style.OUTDOORS)
-                bottomSheetDialog.dismiss()
-            }
-            if(!bottomSheetDialog.isShowing) {
-                bottomSheetDialog.show()
-            }
+            bottomSheetDialog.show()
         }
 
+    }
 
+    private fun setupMapClickListener() {
+        mapView.mapboxMap.addOnMapClickListener { point ->
+            mapManager.addPointToMap(point)
+            true
+        }
     }
 }

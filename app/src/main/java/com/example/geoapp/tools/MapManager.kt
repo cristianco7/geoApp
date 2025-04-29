@@ -24,8 +24,8 @@ class MapManager(private val mapView: MapView) {
         private const val LAYER_ID = "clicked-point-layer"
     }
 
-    fun initializeMap(onStyleLoaded: () -> Unit) {
-        mapView.mapboxMap.loadStyle(Style.MAPBOX_STREETS) { style ->
+    fun initializeMap(styleUrl: String, onStyleLoaded: () -> Unit) {
+        mapView.mapboxMap.loadStyle(styleUrl) { style ->
             val drawable =
                 AppCompatResources.getDrawable(mapView.context, R.drawable.ic_location_marker_icon)
             val bitmap = drawable?.toBitmap()
