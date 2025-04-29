@@ -2,19 +2,30 @@ package com.example.geoapp
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.adapter.BaseMapAdapter
+import com.example.geoapp.adapter.FavoritePointsAdapter
+import com.example.geoapp.database.AppDatabase
 import com.example.geoapp.models.BaseMapItem
 import com.example.geoapp.tools.LocationManager
 import com.example.geoapp.tools.MapManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import com.mapbox.maps.plugin.gestures.addOnMapLongClickListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.mapView)
         val btnCenterLocation = findViewById<ImageButton>(R.id.btnCenterLocation)
         val btnChangeBaseMap = findViewById<ImageButton>(R.id.btnChangeBaseMap)
-        mapManager = MapManager(mapView)
+        mapManager = MapManager(mapView,this)
         locationManager = LocationManager(this, mapView, requestPermissionLauncher)
 
         mapManager.initializeMap(Style.MAPBOX_STREETS) {}
@@ -65,7 +76,9 @@ class MainActivity : AppCompatActivity() {
                     BaseMapItem(R.drawable.ic_basemap_dark, getString(R.string.dark), Style.DARK),
                 )
 
-                val adapter = BaseMapAdapter(baseMapItems) { item ->
+                val currentStyle = mapView.mapboxMap.style?.styleURI ?: Style.MAPBOX_STREETS
+
+                val adapter = BaseMapAdapter(baseMapItems, currentStyle) { item ->
                     mapManager.initializeMap(item.styleUrl) {
                         setupMapClickListener()
                     }

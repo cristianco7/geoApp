@@ -1,9 +1,11 @@
 package com.example.geoapp.tools
 
-import android.graphics.BitmapFactory
+import android.content.Context
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import com.example.geoapp.R
+import com.example.geoapp.database.AppDatabase
+import com.example.geoapp.models.FavoritePoint
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
@@ -12,8 +14,11 @@ import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getSourceAs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class MapManager(private val mapView: MapView) {
+class MapManager(private val mapView: MapView, private  val context: Context) {
 
     private var isPointAdded = false
 
@@ -86,6 +91,16 @@ class MapManager(private val mapView: MapView) {
                 .iconImage("ic_location-marker-icon")
                 .iconAllowOverlap(true)
             style.addLayer(symbolLayer)
+        }
+    }
+
+    fun saveFavoritePoint(name: String, latitude: Double, longitude: Double) {
+        val database = AppDatabase.getDatabase(context)
+        val favoritePoint = FavoritePoint(name = name, latitude = latitude, longitude = longitude)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            database.favoritePointDao().insertFavoritePoint(favoritePoint)
+
         }
     }
 
