@@ -7,6 +7,7 @@ import com.example.geoapp.R
 import com.example.geoapp.database.AppDatabase
 import com.example.geoapp.models.FavoritePoint
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.layers.addLayer
@@ -71,6 +72,13 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
         }
     }
 
+    fun addPointToMapLong(point: Point) {
+        mapView.mapboxMap.getStyle { style ->
+            addOrUpdateSource(style, point)
+            addLayerIfNotExits(style)
+        }
+    }
+
     private fun removeSourceAndLayer(style: Style) {
         if (style.styleSourceExists(SOURCE_ID)) style.removeStyleSource(SOURCE_ID)
         if (style.styleLayerExists(LAYER_ID)) style.removeStyleLayer(LAYER_ID)
@@ -101,6 +109,15 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             database.favoritePointDao().insertFavoritePoint(favoritePoint)
         }
+    }
+
+    fun centerMapOnPoint(latitude: Double, longitude: Double) {
+        val point = Point.fromLngLat(longitude, latitude)
+        mapView.mapboxMap.setCamera(
+            CameraOptions.Builder()
+            .center(point)
+            .zoom(20.0)
+            .build())
     }
 
 }

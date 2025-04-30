@@ -16,4 +16,7 @@
     <string name="marker">Marker</string>
     <string name="point_name">Point Name</string>
     <string name="lat_0_0_lng_0_0">Lat: 0.0, Lng: 0.0</string>
+    <string name="go_to">Go to</string>
+    <string name="point_saved">Point saved successfully</string>
+    <string name="enter_point_name">Please enter a point name</string>
 </resources>

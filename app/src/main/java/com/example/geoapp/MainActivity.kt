@@ -1,15 +1,10 @@
 package com.example.geoapp
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.adapter.BaseMapAdapter
 import com.example.geoapp.adapter.FavoritePointAdapter
@@ -33,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var baseMapAdapter: BaseMapAdapter
     private lateinit var favoritePointAdapter: FavoritePointAdapter
+    private var isBottomSheetVisible = false
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -50,6 +46,8 @@ class MainActivity : AppCompatActivity() {
         val btnChangeBaseMap = findViewById<ImageButton>(R.id.btnChangeBaseMap)
         mapManager = MapManager(mapView,this)
         locationManager = LocationManager(this, mapView, requestPermissionLauncher)
+
+        favoritePointAdapter = FavoritePointAdapter(emptyList())
 
         mapManager.initializeMap(Style.MAPBOX_STREETS) {}
 
@@ -100,35 +98,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupMapLongClickListener() {
         mapView.mapboxMap.addOnMapLongClickListener { point ->
-            mapManager.addPointToMap(point)
-            UIUtils.showBottomSheet(this, R.layout.item_favorite_point) { view, bottomSheetDialog ->
-                val edtPointName = view.findViewById<EditText>(R.id.edtPointName)
-                val btnSavePoint = view.findViewById<Button>(R.id.btnSavePoint)
-                val btnFavorites = view.findViewById<ImageView>(R.id.btnFavorites)
-                val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFavoritePoints) // Cambiado a view.findViewById
-
-                btnFavorites.setOnClickListener {
-                    recyclerView.layoutManager = LinearLayoutManager(this)
-                    favoritePointAdapter = FavoritePointAdapter(emptyList())
-                    recyclerView.adapter = favoritePointAdapter
-                    recyclerView.visibility = View.VISIBLE // Asegúrate de que sea visible
-                    edtPointName.visibility = View.VISIBLE
-                    btnSavePoint.visibility = View.VISIBLE
-
-                    loadFavoritePoints()
-                }
-
-                btnSavePoint.setOnClickListener {
-                    val pointName = edtPointName.text.toString()
-                    if (pointName.isNotEmpty()) {
-                        mapManager.saveFavoritePoint(pointName, point.latitude(), point.longitude())
-                        bottomSheetDialog.dismiss()
-                        println("Point saved: $pointName at ${point.latitude()}, ${point.longitude()}")
-                    } else {
-                        println("Point name cannot be empty")
-                    }
-                }
-            }
+            mapManager.addPointToMapLong(point)
+            UIUtils.showFavoritePointBottomSheet(
+                context = this,
+                point = point,
+                mapManager = mapManager,
+                favoritePointAdapter = favoritePointAdapter,
+                loadFavoritePoints = { loadFavoritePoints() },
+                onDismiss = { isBottomSheetVisible = false }
+            )
             true
         }
     }
