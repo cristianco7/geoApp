@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation("androidx.room:room-runtime:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
+    implementation(libs.androidx.core)
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("com.mapbox.maps:android:11.11.0")
     testImplementation(libs.junit)

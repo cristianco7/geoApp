@@ -9,10 +9,11 @@
     <string name="base_map">Base Map</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
-    <string name="navigate">Navigate</string>
-    <string name="point_name">Point Name</string>
     <string name="save">Save</string>
-    <string name="description">Add a description</string>
+    <string name="name">Add a name</string>
     <string name="point_type">Point Type</string>
     <string name="error_empty_name">Empty name</string>
+    <string name="marker">Marker</string>
+    <string name="point_name">Point Name</string>
+    <string name="lat_0_0_lng_0_0">Lat: 0.0, Lng: 0.0</string>
 </resources>

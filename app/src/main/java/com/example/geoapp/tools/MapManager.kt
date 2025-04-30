@@ -100,7 +100,6 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
 
         CoroutineScope(Dispatchers.IO).launch {
             database.favoritePointDao().insertFavoritePoint(favoritePoint)
-
         }
     }
 
