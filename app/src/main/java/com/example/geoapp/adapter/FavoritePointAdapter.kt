@@ -4,19 +4,22 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.R
 import com.example.geoapp.models.FavoritePoint
 
 class FavoritePointAdapter(
-    private var points: List<FavoritePoint>
+    private var points: List<FavoritePoint>,
+    private val onShowOnMapClick: (FavoritePoint) -> Unit,
 ) : RecyclerView.Adapter<FavoritePointAdapter.FavoritePointViewHolder>() {
+
 
     class FavoritePointViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtPointName: TextView = view.findViewById(R.id.txtPointName)
         val txtCoordinates: TextView = view.findViewById(R.id.txtCoordinates)
+        val btnShowOnMap: LinearLayout = view.findViewById(R.id.btnShowOnMap)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritePointViewHolder {
@@ -29,6 +32,9 @@ class FavoritePointAdapter(
         val point = points[position]
         holder.txtPointName.text = point.name
         holder.txtCoordinates.text = "Lat: ${point.latitude}, Lng: ${point.longitude}"
+        holder.btnShowOnMap.setOnClickListener {
+            onShowOnMapClick(point)
+        }
     }
 
     override fun getItemCount(): Int = points.size

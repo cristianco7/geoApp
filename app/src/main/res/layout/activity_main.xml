@@ -13,8 +13,10 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottomToolbar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <FrameLayout
             android:layout_width="wrap_content"
@@ -68,7 +70,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/bottomToolbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,15 +81,65 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="8dp">
 
-            <ImageButton
-                android:id="@+id/btnFavorites"
-                android:layout_width="60dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/favorites"
-                android:src="@drawable/ic_favorite" />
+            <LinearLayout
+                android:id="@+id/btnExplore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:id="@+id/iconExplore"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/explore"
+                    android:src="@drawable/ic_location_marker_icon"
+                    app:tint="@android:color/black" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/helvetica"
+                    android:text="@string/explore"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnFavoritesPoints"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iconFavorite"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/favorites"
+                    android:src="@drawable/ic_favorite" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/helvetica"
+                    android:text="@string/favorites"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>

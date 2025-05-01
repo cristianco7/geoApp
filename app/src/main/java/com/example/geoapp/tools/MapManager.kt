@@ -59,9 +59,9 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
     }
 
 
-    fun addPointToMap(point: Point) {
+    fun addPointToMap(point: Point, forceAdd: Boolean = false) {
         mapView.mapboxMap.getStyle { style ->
-            if (isPointAdded) {
+            if (!forceAdd && isPointAdded) {
                 removeSourceAndLayer(style)
                 isPointAdded = false
             } else {
@@ -115,9 +115,13 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
         val point = Point.fromLngLat(longitude, latitude)
         mapView.mapboxMap.setCamera(
             CameraOptions.Builder()
-            .center(point)
-            .zoom(20.0)
-            .build())
+                .center(point)
+                .zoom(15.0)
+                .build()
+        )
+        addPointToMap(point, forceAdd = true)
     }
+
+
 
 }

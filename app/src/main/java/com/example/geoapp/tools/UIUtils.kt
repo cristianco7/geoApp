@@ -7,15 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.geoapp.MainActivity
 import com.example.geoapp.R
 import com.example.geoapp.adapter.FavoritePointAdapter
+import com.example.geoapp.database.AppDatabase
+import com.example.geoapp.models.FavoritePoint
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.geojson.Point
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 object UIUtils {
@@ -62,24 +68,28 @@ object UIUtils {
         context: Context,
         point: Point,
         mapManager: MapManager,
-        favoritePointAdapter: FavoritePointAdapter,
-        loadFavoritePoints: () -> Unit,
+        points: List<FavoritePoint>,
         onDismiss: () -> Unit
     ): BottomSheetDialog {
         return showBottomSheet(context, R.layout.item_favorite_point) { view, bottomSheetDialog ->
             val edtPointName = view.findViewById<EditText>(R.id.edtPointName)
             val btnSavePoint = view.findViewById<Button>(R.id.btnSavePoint)
-            val btnFavorites = view.findViewById<ImageView>(R.id.btnFavorites)
+            val btnFavorites = view.findViewById<LinearLayout>(R.id.btnFavorites)
             val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFavoritePoints)
+
+
+            val adapter = FavoritePointAdapter(points) { selectedPoint ->
+                mapManager.centerMapOnPoint(selectedPoint.latitude, selectedPoint.longitude)
+                bottomSheetDialog.dismiss()
+            }
 
             btnFavorites.setOnClickListener {
                 if (edtPointName.visibility != View.VISIBLE) {
                     recyclerView.layoutManager = LinearLayoutManager(context)
-                    favoritePointAdapter.updatePoints(emptyList())
-                    recyclerView.adapter = favoritePointAdapter
+                    recyclerView.adapter = adapter
+                    recyclerView.visibility = View.VISIBLE
                     edtPointName.visibility = View.VISIBLE
                     btnSavePoint.visibility = View.VISIBLE
-                    loadFavoritePoints()
                 }
             }
 
@@ -102,7 +112,7 @@ object UIUtils {
     }
 
 
-    fun showCustomToast(context: Context, message: String, duration: Int = Toast.LENGTH_SHORT) {
+    private fun showCustomToast(context: Context, message: String, duration: Int = Toast.LENGTH_SHORT) {
         val toastView = LayoutInflater.from(context).inflate(R.layout.toast_transaparent, null)
         val toastText = toastView.findViewById<TextView>(R.id.toastMessageDoc)
         toastText.text = message
@@ -112,5 +122,29 @@ object UIUtils {
         toast.view = toastView
         toast.setGravity(Gravity.CENTER,0,600)
         toast.show()
+    }
+
+    fun showFavoritePointsRecyclerView(
+        mapManager: MapManager,
+        context: Context,
+        points: List<FavoritePoint>
+    ) {
+        if (points.isEmpty()) {
+            showCustomToast(context, context.getString(R.string.no_favorite_points))
+            return
+        }
+        showBottomSheet(context, R.layout.item_favorite_point) { view, bottomSheetDialog ->
+            val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFavoritePoints)
+            val linearLayoutBaseMap = view.findViewById<LinearLayout>(R.id.linearLayoutBaseMap)
+            linearLayoutBaseMap.visibility = View.GONE
+            val adapter = FavoritePointAdapter(points) { selectedPoint ->
+                mapManager.centerMapOnPoint(selectedPoint.latitude, selectedPoint.longitude)
+                bottomSheetDialog.dismiss()
+            }
+
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = adapter
+            recyclerView.visibility = View.VISIBLE
+        }
     }
 }

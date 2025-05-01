@@ -3,6 +3,7 @@
     <string name="center_location">Center Location</string>
     <string name="change_base_map">Change Base Map</string>
     <string name="favorites">Favorites</string>
+    <string name="add_favorites">Add Favorites</string>
     <string name="streets">Streets</string>
     <string name="satellite">Satellite</string>
     <string name="outdoors">Outdoors</string>
@@ -19,4 +20,6 @@
     <string name="go_to">Go to</string>
     <string name="point_saved">Point saved successfully</string>
     <string name="enter_point_name">Please enter a point name</string>
+    <string name="explore">Explore</string>
+    <string name="no_favorite_points">No favorite points added</string>
 </resources>

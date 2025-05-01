@@ -2,14 +2,17 @@ package com.example.geoapp
 
 import android.os.Bundle
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.adapter.BaseMapAdapter
-import com.example.geoapp.adapter.FavoritePointAdapter
 import com.example.geoapp.database.AppDatabase
 import com.example.geoapp.models.BaseMapItem
+import com.example.geoapp.models.FavoritePoint
 import com.example.geoapp.tools.LocationManager
 import com.example.geoapp.tools.MapManager
 import com.example.geoapp.tools.UIUtils
@@ -27,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mapManager: MapManager
     private lateinit var locationManager: LocationManager
     private lateinit var baseMapAdapter: BaseMapAdapter
-    private lateinit var favoritePointAdapter: FavoritePointAdapter
     private var isBottomSheetVisible = false
 
     private val requestPermissionLauncher =
@@ -44,14 +46,24 @@ class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.mapView)
         val btnCenterLocation = findViewById<ImageButton>(R.id.btnCenterLocation)
         val btnChangeBaseMap = findViewById<ImageButton>(R.id.btnChangeBaseMap)
+        val btnFavoritePoints = findViewById<LinearLayout>(R.id.btnFavoritesPoints)
+        val iconExplore = findViewById<ImageView>(R.id.iconExplore)
+
         mapManager = MapManager(mapView,this)
         locationManager = LocationManager(this, mapView, requestPermissionLauncher)
-
-        favoritePointAdapter = FavoritePointAdapter(emptyList())
 
         mapManager.initializeMap(Style.MAPBOX_STREETS) {}
 
         setupBaseMapDialog()
+        iconExplore.background = ContextCompat.getDrawable(this, R.drawable.rounded_background)
+
+        btnFavoritePoints.setOnClickListener {
+            loadFavoritePoints { points ->
+                UIUtils.showFavoritePointsRecyclerView(mapManager,this,points)
+            }
+
+        }
+
 
         btnCenterLocation.setOnClickListener {
             locationManager.checkAndEnableLocation()
@@ -72,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupMapClickListener() {
         mapView.mapboxMap.addOnMapClickListener { point ->
-            mapManager.addPointToMap(point)
+            mapManager.addPointToMap(point, false)
             true
         }
     }
@@ -99,27 +111,28 @@ class MainActivity : AppCompatActivity() {
     private fun setupMapLongClickListener() {
         mapView.mapboxMap.addOnMapLongClickListener { point ->
             mapManager.addPointToMapLong(point)
-            UIUtils.showFavoritePointBottomSheet(
-                context = this,
-                point = point,
-                mapManager = mapManager,
-                favoritePointAdapter = favoritePointAdapter,
-                loadFavoritePoints = { loadFavoritePoints() },
-                onDismiss = { isBottomSheetVisible = false }
-            )
+            loadFavoritePoints { points ->
+                UIUtils.showFavoritePointBottomSheet(
+                    context = this,
+                    point = point,
+                    mapManager = mapManager,
+                    points = points,
+                    onDismiss = { isBottomSheetVisible = false }
+                )
+            }
             true
         }
     }
 
 
-    private fun loadFavoritePoints() {
+    private fun loadFavoritePoints(onLoaded: (List<FavoritePoint>) -> Unit) {
         val database = AppDatabase.getDatabase(this)
         val favoritePointDao = database.favoritePointDao()
 
         CoroutineScope(Dispatchers.IO).launch {
             val points = favoritePointDao.getAllFavoritePoints()
             runOnUiThread {
-                favoritePointAdapter.updatePoints(points)
+                onLoaded(points)
             }
         }
     }
