@@ -10,9 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.adapter.BaseMapAdapter
-import com.example.geoapp.database.AppDatabase
 import com.example.geoapp.database.DatabaseHelper.loadPoints
-import com.example.geoapp.database.FavoritePointDao
 import com.example.geoapp.models.BaseMapItem
 import com.example.geoapp.models.FavoritePoint
 import com.example.geoapp.tools.LocationManager
@@ -23,9 +21,6 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapLongClickListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -114,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         baseMapAdapter = BaseMapAdapter(baseMapItems, currentStyle) { item ->
             mapManager.initializeMap(item.styleUrl) {
                 setupMapClickListener()
+                mapManager.reloadAlertPoints()
             }
         }
     }

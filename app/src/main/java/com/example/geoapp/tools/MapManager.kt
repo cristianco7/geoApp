@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 class MapManager(private val mapView: MapView, private  val context: Context) {
 
     private var isPointAdded = false
+    private val alertPoints = mutableListOf<Point>()
 
     companion object {
         private const val GEOJSON_URL =
@@ -126,6 +127,7 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
     }
 
     fun addAlertPointToMap(point: Point) {
+        alertPoints.add(point)
         mapView.mapboxMap.getStyle { style ->
             val sourceId = "alert-point-source-${point.hashCode()}"
             val layerId = "alert-point-layer-${point.hashCode()}"
@@ -180,6 +182,19 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
             }
         }
         animator.start()
+    }
+
+    fun reloadAlertPoints() {
+        mapView.mapboxMap.getStyle { style ->
+            alertPoints.forEach { point ->
+                val sourceId = "alert-point-source-${point.hashCode()}"
+                val layerId = "alert-point-layer-${point.hashCode()}"
+
+                addGeoJsonSourceIfNotExists(style, sourceId, point)
+                addCircleLayerIfNotExists(style, layerId, sourceId)
+                animateCircleLayer(style, layerId)
+            }
+        }
     }
 
 
