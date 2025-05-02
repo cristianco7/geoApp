@@ -28,28 +28,6 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:id="@+id/btnPointType"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_location" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/point_type"
-                    android:fontFamily="@font/helvetica"
-                    android:textSize="16sp"
-                    android:layout_marginBottom="16dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
                 android:id="@+id/btnFavorites"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -57,8 +35,8 @@
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/ic_favorite" />
 
                 <TextView
@@ -90,12 +68,12 @@
             android:layout_margin="16dp"
             android:padding="8dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSavePoint"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/BtnAccept"
+            android:background="@drawable/background_btn"
             android:text="@string/save"
             android:layout_margin="10dp" />
 

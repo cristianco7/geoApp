@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">geoApp</string>
+    <string name="app_name">GeoApp</string>
     <string name="center_location">Center Location</string>
     <string name="change_base_map">Change Base Map</string>
     <string name="favorites">Favorites</string>
@@ -22,4 +22,11 @@
     <string name="enter_point_name">Please enter a point name</string>
     <string name="explore">Explore</string>
     <string name="no_favorite_points">No favorite points added</string>
+    <string name="add_normal_point">Add normal point</string>
+    <string name="add_alert_point">Add alert point</string>
+    <string name="select_point_type">Select point type</string>
+    <string name="choose_point_type">Choose point type</string>
+    <string name="normal_point">Normal point</string>
+    <string name="alert_point">Alert point</string>
+
 </resources>

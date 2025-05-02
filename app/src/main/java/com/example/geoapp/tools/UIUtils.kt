@@ -2,26 +2,23 @@ package com.example.geoapp.tools
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.geoapp.MainActivity
 import com.example.geoapp.R
 import com.example.geoapp.adapter.FavoritePointAdapter
-import com.example.geoapp.database.AppDatabase
 import com.example.geoapp.models.FavoritePoint
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.mapbox.geojson.Point
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 object UIUtils {
@@ -73,7 +70,7 @@ object UIUtils {
     ): BottomSheetDialog {
         return showBottomSheet(context, R.layout.item_favorite_point) { view, bottomSheetDialog ->
             val edtPointName = view.findViewById<EditText>(R.id.edtPointName)
-            val btnSavePoint = view.findViewById<Button>(R.id.btnSavePoint)
+            val btnSavePoint = view.findViewById<AppCompatButton>(R.id.btnSavePoint)
             val btnFavorites = view.findViewById<LinearLayout>(R.id.btnFavorites)
             val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerFavoritePoints)
 
@@ -120,7 +117,7 @@ object UIUtils {
         val toast = Toast(context)
         toast.duration = duration
         toast.view = toastView
-        toast.setGravity(Gravity.CENTER,0,600)
+        toast.setGravity(Gravity.CENTER,0,500)
         toast.show()
     }
 
@@ -147,4 +144,28 @@ object UIUtils {
             recyclerView.visibility = View.VISIBLE
         }
     }
+
+    fun showPointTypeDialog(context: Context, onPointSelected: (isAlertPoint: Boolean) -> Unit) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_point_type_selector, null)
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+
+        val btnNormalPoint = dialogView.findViewById<AppCompatButton>(R.id.btnNormalPoint)
+        val btnAlertPoint = dialogView.findViewById<AppCompatButton>(R.id.btnAlertPoint)
+
+        btnNormalPoint.setOnClickListener {
+            onPointSelected(false)
+            dialog.dismiss()
+        }
+
+        btnAlertPoint.setOnClickListener {
+            onPointSelected(true)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+    }
+
 }

@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.geoapp.adapter.BaseMapAdapter
 import com.example.geoapp.database.AppDatabase
+import com.example.geoapp.database.DatabaseHelper.loadPoints
+import com.example.geoapp.database.FavoritePointDao
 import com.example.geoapp.models.BaseMapItem
 import com.example.geoapp.models.FavoritePoint
 import com.example.geoapp.tools.LocationManager
 import com.example.geoapp.tools.MapManager
 import com.example.geoapp.tools.UIUtils
+import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
@@ -52,7 +55,9 @@ class MainActivity : AppCompatActivity() {
         mapManager = MapManager(mapView,this)
         locationManager = LocationManager(this, mapView, requestPermissionLauncher)
 
-        mapManager.initializeMap(Style.MAPBOX_STREETS) {}
+        mapManager.initializeMap(Style.MAPBOX_STREETS) {
+            loadAlertPoints()
+        }
 
         setupBaseMapDialog()
         iconExplore.background = ContextCompat.getDrawable(this, R.drawable.rounded_background)
@@ -84,7 +89,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupMapClickListener() {
         mapView.mapboxMap.addOnMapClickListener { point ->
-            mapManager.addPointToMap(point, false)
+            UIUtils.showPointTypeDialog(this) { isAlertPoint ->
+                if (isAlertPoint) {
+                    mapManager.addAlertPointToMap(point)
+                } else {
+                    mapManager.addPointToMap(point, false)
+                }
+            }
             true
         }
     }
@@ -126,16 +137,16 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun loadFavoritePoints(onLoaded: (List<FavoritePoint>) -> Unit) {
-        val database = AppDatabase.getDatabase(this)
-        val favoritePointDao = database.favoritePointDao()
+        loadPoints(this, { getAllFavoritePoints() }, onLoaded)
+    }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val points = favoritePointDao.getAllFavoritePoints()
-            runOnUiThread {
-                onLoaded(points)
+    private fun loadAlertPoints() {
+        loadPoints(this, { getAlertPoints() }) { alertPoints ->
+            alertPoints.forEach { point ->
+                val mapPoint = Point.fromLngLat(point.longitude, point.latitude)
+                mapManager.addAlertPointToMap(mapPoint)
             }
         }
     }
-
 
 }

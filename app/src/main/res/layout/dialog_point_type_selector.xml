@@ -1,0 +1,50 @@
+<androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/cards"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="4dp"
+        android:layout_margin="8dp">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+        <TextView
+                android:id="@+id/tvDialogTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_point_type"
+                android:fontFamily="@font/helvetica"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingBottom="8dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnNormalPoint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_normal_point"
+                android:textAllCaps="false"
+                android:fontFamily="@font/helvetica"
+                android:background="@drawable/background_btn"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="8dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAlertPoint"
+                android:layout_width="match_parent"
+                android:fontFamily="@font/helvetica"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:text="@string/add_alert_point"
+                android:background="@drawable/background_btn"
+                android:backgroundTint="@color/alertColor"
+                android:textColor="@android:color/white" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

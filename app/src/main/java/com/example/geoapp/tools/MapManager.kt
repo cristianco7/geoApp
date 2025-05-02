@@ -1,5 +1,6 @@
 package com.example.geoapp.tools
 
+import android.animation.ValueAnimator
 import android.content.Context
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
@@ -11,7 +12,9 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.CircleLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.getLayerAs
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getSourceAs
@@ -122,6 +125,62 @@ class MapManager(private val mapView: MapView, private  val context: Context) {
         addPointToMap(point, forceAdd = true)
     }
 
+    fun addAlertPointToMap(point: Point) {
+        mapView.mapboxMap.getStyle { style ->
+            val sourceId = "alert-point-source-${point.hashCode()}"
+            val layerId = "alert-point-layer-${point.hashCode()}"
+
+            addGeoJsonSourceIfNotExists(style, sourceId, point)
+            addCircleLayerIfNotExists(style, layerId, sourceId)
+            animateCircleLayer(style, layerId)
+
+            val database = AppDatabase.getDatabase(context)
+            CoroutineScope(Dispatchers.IO).launch {
+                val existing = database.favoritePointDao()
+                    .getAlertPointByLocation(point.latitude(), point.longitude())
+
+                if (existing == null) {
+                    val alertPoint = FavoritePoint(
+                        name = context.getString(R.string.alert_point),
+                        latitude = point.latitude(),
+                        longitude = point.longitude(),
+                        isAlertPoint = true
+                    )
+                    database.favoritePointDao().insertFavoritePoint(alertPoint)
+                }
+            }
+        }
+    }
+
+    private fun addGeoJsonSourceIfNotExists(style: Style, sourceId: String, point: Point) {
+        if (!style.styleSourceExists(sourceId)) {
+            val geoJsonSource = GeoJsonSource.Builder(sourceId).geometry(point).build()
+            style.addSource(geoJsonSource)
+        }
+    }
+
+    private fun addCircleLayerIfNotExists(style: Style, layerId: String, sourceId: String) {
+        if (!style.styleLayerExists(layerId)) {
+            val circleLayer = CircleLayer(layerId, sourceId)
+                .circleRadius(5.0)
+                .circleColor("#FF0000")
+                .circleOpacity(0.5)
+            style.addLayer(circleLayer)
+        }
+    }
+
+    private fun animateCircleLayer(style: Style, layerId: String) {
+        val animator = ValueAnimator.ofFloat(5f, 20f).apply {
+            duration = 1500
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            addUpdateListener { animation ->
+                val animatedValue = animation.animatedValue as Float
+                style.getLayerAs<CircleLayer>(layerId)?.circleRadius(animatedValue.toDouble())
+            }
+        }
+        animator.start()
+    }
 
 
 }
