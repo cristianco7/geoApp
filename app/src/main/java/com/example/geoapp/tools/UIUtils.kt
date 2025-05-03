@@ -109,7 +109,7 @@ object UIUtils {
     }
 
 
-    private fun showCustomToast(context: Context, message: String, duration: Int = Toast.LENGTH_SHORT) {
+    fun showCustomToast(context: Context, message: String, duration: Int = Toast.LENGTH_SHORT) {
         val toastView = LayoutInflater.from(context).inflate(R.layout.toast_transaparent, null)
         val toastText = toastView.findViewById<TextView>(R.id.toastMessageDoc)
         toastText.text = message
@@ -117,7 +117,7 @@ object UIUtils {
         val toast = Toast(context)
         toast.duration = duration
         toast.view = toastView
-        toast.setGravity(Gravity.CENTER,0,500)
+        toast.setGravity(Gravity.CENTER, 0, 500)
         toast.show()
     }
 

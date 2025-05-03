@@ -15,6 +15,7 @@ import com.example.geoapp.models.BaseMapItem
 import com.example.geoapp.models.FavoritePoint
 import com.example.geoapp.tools.LocationManager
 import com.example.geoapp.tools.MapManager
+import com.example.geoapp.tools.NetworkUtils
 import com.example.geoapp.tools.UIUtils
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
@@ -73,6 +74,11 @@ class MainActivity : AppCompatActivity() {
         setupMapLongClickListener()
 
         btnChangeBaseMap.setOnClickListener {
+            if (!NetworkUtils.isInternetAvailable(this)) {
+                UIUtils.showCustomToast(this, getString(R.string.no_internet_connection))
+                return@setOnClickListener
+            }
+
             UIUtils.showBottomSheet(this, R.layout.bottom_sheet_basemap) { view, _ ->
                 val recyclerBaseMap = view.findViewById<RecyclerView>(R.id.recyclerBaseMap)
                 recyclerBaseMap.layoutManager = GridLayoutManager(this, 3)
